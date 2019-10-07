@@ -8,7 +8,7 @@ CLOSE_WAIT是四次挥手模型中的状态，模型如图所示：
 
 <img src="images/四次挥手.png" width="70%" style="float: left;">
 
-[四次挥手过程](https://blog.csdn.net/O9A0MA/article/details/90731748){:target="_blank"}
+[四次挥手过程](https://blog.csdn.net/O9A0MA/article/details/90731748)
 
 理解要点：
 
