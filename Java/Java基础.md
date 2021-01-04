@@ -11,6 +11,35 @@
 + 调用方法的通用格式为object.method(parameters)
 + 单行注释“//”，多行注释“/*”、“*/”，自动生成文档的注释“/**”、“*/”
 
+## Java基本程序设计结构
+### 数据类型
+4整型(int, short, long, byte)，2浮点(float, double)，1种用于表示unicode编码的字符单元的字符类型char，1种表示真值的boolean类型。
+
+### 常量
+使用final指示常量，只能被赋值一次
+
+### String
+Java没有字符串类型，但在Java类库种提供了预定义类String，字符串用双引号括起来。
+
+String类不提供修改字符串的方法。不可变字符串的优点：编译器可以让字符串共享。
+
+### 大数值
+java.math包提供了BigInteger和BigDecimal，实现任意精度的计算，且内置add、substract、multiply、devide、mod方法。
+
+### 数组
+声明数组：`int[] a`
+
+创建匿名数组：`new int[] {1,2,3,4}`
+
+### 数组拷贝
+直接拷贝，两个变量饮用同一个数组
+
+`int[] a = b;`
+
+数组的数值拷贝到新的数组
+
+`int[] a = Arrays.copyOf(b, b.length);`
+
 ## TODO
 + 面向对象
 + 集合
