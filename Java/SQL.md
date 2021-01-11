@@ -7,7 +7,7 @@
 `SELECT DISTINCT vend_id FROM products;`
 
 + DISTINCT必须直接放在列名的前面
-+ DISTINCT应用于所有列，而不仅是前置它的列
++ DISTINCT应用于所有列，而不仅是前置它的列
 + 除非指定的多列都相同，否则将返回所有行
 
 ### LIMIT关键字
