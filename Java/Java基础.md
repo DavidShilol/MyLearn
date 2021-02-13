@@ -1,3 +1,5 @@
+[toc]
+
 ## Java小常识
 + 大小写敏感
 + 类是构建所有Java应用程序的构建块，程序中的全部内容必须放置在类中
@@ -40,7 +42,7 @@ java.math包提供了BigInteger和BigDecimal，实现任意精度的计算，且
 
 `int[] a = Arrays.copyOf(b, b.length);`
 
-## 面向对象程序设计概述
+## 对象与类
 
 ### 类、对象、实例的关系
 
@@ -91,9 +93,114 @@ Java总是采用按值调用，方法得到的是所有参数的拷贝。
 + `java -classpath /xxxx:.:/qqq`
 + CLASSPATH
 
+## 接口与内部类
+
+### 接口
+
++ 接口不是类，是对类的一组需求描述
++ 接口中定义必要的方法，但不提供具体的实现
++ 接口中可以定义常量，但不能定义实例域
+
+### 类实现接口
+
+为了让类实现一个接口，需要两个步骤：
+1. 将类声明为实现给定的接口（使用implements关键字声明）
+2. 对接口中的所有方法进行定义
+
+```Java
+// 定义接口
+public interface Comparable<T>
+{
+    int compareTo(T other);
+}
+
+// 类中实现接口
+public class Employee implements Comparable<Employee>
+{
+    public int compareTo(Employee other){
+        return Double.compare(salary, other.salary);
+    }
+}
+```
+
+*注释：接口中的方法/变量不用提供public，将会自动被设为public，但类中实现接口时需要为方法提供public，否则编译器认为该方法是包可见的。*
+
+### 类实现多接口
+
+```Java
+public class Employee implements Cloneable, Comparable
+```
+
+### 接口与抽象类
+
+Java只允许有一个超类，不支持多继承，但支持多接口实现。
+
+### 接口变量引用类对象
+
+```Java
+// Employee类实现了Comparable接口
+Comparable<Employee> c = new Employee();
+```
+
+### 接口是一种类型
+
+接口不是类，但接口是类型。
+
+接口不提供具体的方法实现，所以不是类。
+
+接口可以定义变量，所以接口就像int、double一样，是一种类型。
+
+## 泛型
+
+### 定义简单泛型类
+
+一个泛型类就是具有一个或多个类型变量的类
+
+```Java
+public class Pair<T, U>{......}
+```
+
+Pair类引入了类型变量T和U，用尖括号括起来，放在类名后面，可以有多个类型变量。
+
+Java中，使用E表示集合的元素类型，使用K和V分别表示表的关键字与值的类型，T、U、S表示“任意类型”。
+
+实例化泛型类型：
+
+```Java
+Pair<String, Integer>
+```
+
+### 泛型方法
+
+```Java
+class ArrayAlg
+{
+    public static <T> T getMiddle(T... a)
+    {
+        return a[a.length / 2];
+    }
+}
+```
+
++ 类型变量放在修饰符之后，返回类型之前
++ 泛型方法可以在普通类中定义，可以在泛型类型中定义
++ 调用泛型方法时，在方法名前的尖括号放入具体的类型，通常也可以省略`<String>`这样的类型参数，因为编译器有足够的信息推断出所调用的方法
+
+## 集合
+
+### 集合接口
+
+实现方法时，不同的数据结构会导致实现风格和性能有很大差异。Java集合类库采用接口与实现分离，使用接口类型存放集合的引用，这样只需要在构建集合时关心使用哪种实现。
+
+```Java
+Queue<Customer> expressLane = new CircularArrayQueue<>(100);
+// Queue<Customer> expressLane = new LinkedListQueue<>();
+expressLane.add(new Customer("Harry"));
+```
+
 ## TODO
 + 面向对象
-+ 集合
++ ~~集合~~
 + IO
 + 异常
 + 操作系统
