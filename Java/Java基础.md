@@ -231,13 +231,21 @@ Vector用于多个线程安全地访问一个Vector对象。
 
 ### 散列表
 
+**特点**
+
 散列表可以快速查找元素，和列表相比，不需要遍历元素。缺点是无法控制元素的出现次序。
 
+**散列码**
+
 散列表为每一个对象计算一个散列码，原理是不同的对象的实例域将产生不同的散列码。
+
+**原理**
 
 Java中，散列表用链表实现，每个列表被称为桶（bucket）。计算对象的散列码，并与桶的总数取余，结果就是这个元素的桶索引。
 
 如果插入元素时发现桶非空，这种现象称为散列冲突。需要用新对象与桶中的所有对象进行比较，查看是否存在。
+
+**相关参数**
 
 桶数越大，发生散列冲突的可能性越小。如果预先知道元素数目，创建散列表时可以设置桶数。通常默认值为2的16次幂。
 
@@ -257,6 +265,104 @@ words.add("hhh");
 树集是一个有序集合。以任意顺序将元素插入到集合中，对集合进行遍历时，每个值将自动按排序后的顺序呈现。
 
 树集TreeSet类的树结构使用的是红黑树，每次插入的元素将放置在正确的排序位置上。查找元素的正确位置平均需要log2n次比较。
+
+## 多线程
+
+### 锁对象
+
+锁对象用于防止代码块受并发访问的干扰。句式如下：
+
+```Java
+private Lock myLock = new ReentrantLock();
+myLock.lock();
+try
+{
+    // critical section
+}
+finally
+{
+    myLock.unlock();
+}
+```
+
+任何时刻只有一个线程进入临界区。一旦一个线程封锁了锁对象，其他任何线程都无法通过lock语句。其他线程将被阻塞，直到第一个线程释放锁对象。
+
+锁是可重入的，线程可以重复获得已经持有的锁。锁保持一个持有计数来跟踪对lock方法的嵌套调用。lock和unlock必须成对出现。
+
+### 条件对象
+
+通常线程进入临界区后，需要满足一定条件才能执行操作，比如银行取钱的过程，只有取出金额小于余额时才能执行。条件对象用来管理那些已经获得了一个锁但是却不能做有用工作的线程。句式如下：
+
+```Java
+Lock myLock = new ReentrantLock();
+myLock.lock();
+Condition sufficientFunds = new myLock.newCondition();
+try
+{
+    while(account[from] < amount)
+    {
+        sufficientFunds.await();
+    }
+    // transfer
+    sufficientFunds.signalAll();
+}
+finally
+{
+    myLock.unlock();
+}
+```
+
+当线程调用sufficientFunds.await()时，将被阻塞并放弃锁，该线程进入该条件的等待集。直到另一个线程调用同一条件上的signalAll方法时为止。
+
+某一线程调用signalAll时，因为这一条件而等待的所有线程将从等待集中移出，解除阻塞状态。它们将尝试进入对象，一旦锁可用，某一个线程将从await调用返回，获得锁并从被阻塞的地方继续执行。
+
+signalAll仅仅是通知等待的线程，此时可能已经满足条件，所以线程获得锁后仍然需要去检验条件是否满足。
+
+### synchronized关键字
+
+Java中每个对象都有一个内部锁，并且该锁有一个内部条件（其实就是对象有自己的ReentrantLock object和Condition object）。如果一个方法声明synchronized，那么对象的锁将保护整个方法，调用该方法就需要获得内部的对象锁。
+
+锁管理进入synchronized方法的线程，条件管理调用wait的线程。
+
+如果静态方法声明synchronize，其他线程无法调用同一个类的任何同步静态方法。
+
+句式如下：
+
+```Java
+public synchronized void transfer()
+{
+    while(accounts[from] < amount)
+        wait();
+    // transfer
+    notifyAll();
+}
+```
+
+wait/notifyAll方法是Object类的final方法，Condition的await/signalAll如此命名从而避免与那些方法发生冲突。
+
+**synchronized局限性**
+
++ 无法中断正在试图获得锁的线程
++ 试图获得锁时不能设定超时
++ 每个锁仅有但一条件，可能是不够的
+
+### Volatile域
+
+volatile为实例域的同步访问提供了免锁机制，请比较以下两种写法：
+
+```Java
+private boolean done;
+public synchronized boolean isDone() {return done;}
+public synchronized void setDone() {done = true;}
+```
+
+```Java
+private synchronized boolean done;
+public boolean isDone() {return done;}
+public void setDone() {done = true;}
+```
+
+第一种写法存在一个问题，如果一个线程已经获得该对象的锁，这两个方法都可能被阻塞。在这种情况下将域声明为volatile是合理的。
 
 ## TODO
 + 面向对象
